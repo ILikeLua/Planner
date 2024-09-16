@@ -1,7 +1,9 @@
 import Event
 from Date import *
 import os
+#FIXME I have not yet tested this class
 class Planner:
+    #TODO simiplify
     def __init__(self,UserName) -> None:
         id = -1
         if not os.path.exists(f'events\{UserName}'):
@@ -16,9 +18,11 @@ class Planner:
                 self.Events.append(Event.Event(i))
         self.username = UserName
         pass
+    #TODO Simplify
     def addEvent(self,startDT:DateTime, endDT:DateTime,EventName = "",description = "",location = "",UserName = "DefaultName"):
         self.Events.append(Event.Event(self.maxid+1,EventName,description,location,UserName,startDT=startDT,endDT=endDT))
         self.maxid += 1
+    #TODO simplify
     def deleteEvent(self,id):
         os.remove(f'events\{self.username}\{id}.pkl')
         id += 1
