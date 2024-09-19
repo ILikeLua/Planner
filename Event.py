@@ -55,7 +55,8 @@ class Event:
         This automatically occures at initialization
     saveEvent()
         saves the file to relative path Events/<self.Username>/<self.Id>.pkl
-    """
+    deleteSelf(MaxId)
+        deletes self, updates next file's ids    """
     #constructor
     #TODO simiplify
     def __init__(self,id:int,eventName = "",description = "",location = "",userName = "DefaultName",startDT:DateTime = None, endDT:DateTime = None):
@@ -155,6 +156,7 @@ class Event:
             day if day != -1 else self.end.date.Day,
             month if month != -1 else self.end.date.Month, 
             year if year != -1 else self.end.date.Year)
+        self.saveEvent()
     def setStartDateTime(self,minute = -1,hour = -1,day = -1,month = -1,year = -1, *, fullDateTime:DateTime = None) -> None:
         """
         Sets the Start DateTime of the event
@@ -183,7 +185,7 @@ class Event:
             day if day != -1 else self.start.date.Day,
             month if month != -1 else self.start.date.Month, 
             year if year != -1 else self.start.date.Year)
-        
+        self.saveEvent()
     def setEventName(self,EventName) -> None:
         """
         Sets the event name, gets rid of any numbers in the name
@@ -196,6 +198,7 @@ class Event:
             EventName = EventName.replace(str(i),'')
         self.eventName = EventName
         self.saveEvent()
+        
     def setDescription(self,Description) -> None:
         """
         Sets the description name
@@ -204,6 +207,8 @@ class Event:
             The description to change to
         """
         self.description = Description
+        self.saveEvent()
+
     def setLocation(self,Location) -> None:
         """
         Sets the location
@@ -212,6 +217,8 @@ class Event:
             The location to change to
         """
         self.location = Location
+        self.saveEvent()
+
     #If it returns false there is no file to load, if true a file was loaded
     def loadEvent(self,UserName,id) -> bool:
         """
@@ -224,9 +231,9 @@ class Event:
         """
         if not os.path.exists(f'events\\{UserName}\\{id}.pkl'):
             return False
-        print("hi")
+        self.id = id
         with open(f'events\\{UserName}\\{id}.pkl',"rb") as i:
-            self.start,self.end,self.eventName,self.description,self.location,self.id,self.userName = pickle.load(i)
+            self.start,self.end,self.eventName,self.description,self.location,self.userName = pickle.load(i)
         return True
 
     def saveEvent(self):
@@ -236,5 +243,18 @@ class Event:
         if not os.path.exists(f'events\{self.userName}'):
             os.makedirs(f'events\{self.userName}')
         with open(f'events\\{self.userName}\\{self.id}.pkl', 'wb') as i:
-            pickle.dump([self.start,self.end,self.eventName,self.description,self.location,self.id,self.userName],i)
+            pickle.dump([self.start,self.end,self.eventName,self.description,self.location,self.userName],i)
         pass
+    def deleteSelf(self,MaxId):
+        """
+        Deletes self and updates the file names for all the files with a higher ID than it
+        ---
+        parameters:
+        MaxId: The largest id for this user
+
+        """
+        os.remove(f'events\{self.userName}\{self.id}.pkl')
+        id = self.id+1
+        while os.path.exists(f'events\{self.userName}\{id}.pkl'):
+            os.rename(f'events\{self.username}\{id}.pkl',f'events\{self.username}\{id-1}.pkl')
+            id+=1

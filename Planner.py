@@ -5,6 +5,10 @@ import os
 class Planner:
     #TODO simiplify
     def __init__(self,UserName) -> None:
+        self.startUp()
+        pass
+    def startUp(self,UserName):
+        """Used during start up and when an event is deleted to load the events"""
         id = -1
         if not os.path.exists(f'events\{UserName}'):
             os.makedirs(f'events\{UserName}')
@@ -17,21 +21,22 @@ class Planner:
             for i in range(0,id+1):
                 self.Events.append(Event.Event(i))
         self.username = UserName
-        pass
     #TODO Simplify
     def addEvent(self,startDT:DateTime, endDT:DateTime,EventName = "",description = "",location = "",UserName = "DefaultName"):
         self.Events.append(Event.Event(self.maxid+1,EventName,description,location,UserName,startDT=startDT,endDT=endDT))
         self.maxid += 1
     #TODO simplify
     def deleteEvent(self,id):
-        os.remove(f'events\{self.username}\{id}.pkl')
-        id += 1
-        while id <= self.maxid:
-            os.rename(f'events\{self.username}\{id}.pkl',f'events\{self.username}\{id-1}.pkl')
-        self.maxid -= 1
-        self.Events = []
-        if self.maxid > -1:
-            for i in range(0,self.maxid+1):
-                self.Events.append(Event.Event(i))
-i = Planner("Nate")
-#helo
+        self.Events[id].deleteSelf(id)
+        self.startUp(self.username)
+    #TODO Create a Modify for each aspect of Event
+    def changeEndDate(self,id,datetime):
+        self.Events[id].setEndDateTime(datetime)
+    def changeStartDate(self,id,datetime):
+        self.Events[id].setStartDateTime(datetime)
+    def changeEventName(self,id,name):
+        self.Events[id].setEventName(name)
+    def setDescription(self,id,desc):
+        self.Events[id].setDescription(desc)
+    def setLocation(self,id,location):
+        self.Events[id].setLocation(location)
